@@ -1,168 +1,250 @@
-— Why Functions Are Needed
+# 05 — Why Functions Are Needed in Go
 
-Go-তে Functions কেন প্রয়োজন, তা বোঝার সবচেয়ে ভালো উপায় হলো একই problem দুইভাবে solve করা—Function ছাড়া এবং Function ব্যবহার করে।
+## Introduction
 
-1. Code Reusability — একই code বারবার না লেখা
-   ধরো, তোমাকে তিনজন customer-এর total price calculate করতে হবে।
-   Without Function
+Functions are an essential part of Go programming. They help developers write reusable, readable, maintainable, and testable code.
 
+The best way to understand why functions are needed is to solve the same problem in two ways: without functions and with functions.
+
+## 1. Code Reusability
+
+**Code reusability** means writing logic once and using it multiple times instead of repeating the same code.
+
+### Without Function
+
+```go
 package main
 
 import "fmt"
 
 func main() {
-price1 := 100
-quantity1 := 2
-fmt.Println(price1 \* quantity1)
+	price1 := 100
+	quantity1 := 2
+	fmt.Println(price1 * quantity1)
 
-    price2 := 200
-    quantity2 := 3
-    fmt.Println(price2 * quantity2)
+	price2 := 200
+	quantity2 := 3
+	fmt.Println(price2 * quantity2)
 
-    price3 := 150
-    quantity3 := 4
-    fmt.Println(price3 * quantity3)
-
+	price3 := 150
+	quantity3 := 4
+	fmt.Println(price3 * quantity3)
 }
+```
 
-এখানে একই calculation বারবার লিখতে হচ্ছে।
-With Function
+In this example, the same calculation is repeated for three customers.
 
+### With Function
+
+```go
 package main
 
 import "fmt"
 
 func calculateTotal(price, quantity int) int {
-return price \* quantity
+	return price * quantity
 }
 
 func main() {
-fmt.Println(calculateTotal(100, 2))
-fmt.Println(calculateTotal(200, 3))
-fmt.Println(calculateTotal(150, 4))
+	fmt.Println(calculateTotal(100, 2))
+	fmt.Println(calculateTotal(200, 3))
+	fmt.Println(calculateTotal(150, 4))
 }
+```
 
-Output:
+**Output:**
+
+```text
 200
 600
 600
+```
 
-এখন calculation-এর logic একবারই লেখা হয়েছে। প্রয়োজনমতো function call করে ব্যবহার করা যাচ্ছে। 2. Maintainability — সহজে code পরিবর্তন করা
-ধরো, প্রতিটি order-এর total price-এর সঙ্গে ১০% service charge যোগ করতে হবে।
-Function ব্যবহার করলে এক জায়গায় পরিবর্তন করলেই সব call-এ নতুন calculation ব্যবহার হবে।
+Now, the calculation logic is written only once and reused whenever needed.
 
+**Benefits:**
+
+- Reduces code duplication.
+- Makes code easier to maintain.
+- Improves consistency.
+- Makes future changes easier.
+
+## 2. Maintainability
+
+**Maintainability** means making code easier to modify, update, and improve.
+
+Suppose we need to add a 10% service charge to every order.
+
+```go
 package main
 
 import "fmt"
 
 func calculateTotal(price, quantity int) int {
-subtotal := price \* quantity
-serviceCharge := subtotal / 10
+	subtotal := price * quantity
+	serviceCharge := subtotal / 10
 
-    return subtotal + serviceCharge
-
+	return subtotal + serviceCharge
 }
 
 func main() {
-fmt.Println(calculateTotal(100, 2))
-fmt.Println(calculateTotal(200, 3))
+	fmt.Println(calculateTotal(100, 2))
+	fmt.Println(calculateTotal(200, 3))
 }
+```
 
-Output:
+**Output:**
+
+```text
 220
 660
+```
 
-এটি integer-based উদাহরণ। বাস্তব payment system-এ অর্থ হিসাবের জন্য floating-point rounding এড়িয়ে উপযুক্ত decimal বা integer minor units ব্যবহার করা ভালো। 3. Readability — code সহজে বোঝা
-একটি বড় main() function-এর মধ্যে সব logic লিখলে code বোঝা কঠিন হয়।
-Functions ব্যবহার করে কাজগুলো আলাদা করা যায়।
+The calculation is updated in one place, so every function call uses the new logic.
 
+> **Note:** This example uses integer arithmetic for simplicity. In real payment systems, use an appropriate money representation, such as integer minor units or a decimal type, and define how rounding should work.
+
+## 3. Readability
+
+**Readability** means making code easier for developers to understand.
+
+Instead of placing all logic inside `main()`, we can separate responsibilities into functions.
+
+```go
 package main
 
 import "fmt"
 
 func validateAge(age int) bool {
-return age >= 18
+	return age >= 18
 }
 
 func registerUser(name string, age int) {
-if !validateAge(age) {
-fmt.Println("Registration not allowed")
-return
-}
+	if !validateAge(age) {
+		fmt.Println("Registration not allowed")
+		return
+	}
 
-    fmt.Println("User registered:", name)
-
+	fmt.Println("User registered:", name)
 }
 
 func main() {
-registerUser("Zamirul", 20)
-registerUser("Rahim", 16)
+	registerUser("Zamirul", 20)
+	registerUser("Rahim", 16)
 }
+```
 
-Output:
+**Output:**
+
+```text
 User registered: Zamirul
 Registration not allowed
+```
 
-Function-এর নাম দেখেই বোঝা যায় কোন function কী কাজ করে। 4. Testing — সহজে bug খুঁজে বের করা
-ছোট function আলাদাভাবে test করা সহজ।
-main.go:
+The function names describe their responsibilities, making the program easier to understand.
 
+## 4. Testing
+
+Functions make it easier to test individual pieces of logic independently.
+
+### `main.go`
+
+```go
 package main
 
 func add(a, b int) int {
-return a + b
+	return a + b
 }
+```
 
-main_test.go:
+### `main_test.go`
 
+```go
 package main
 
 import "testing"
 
-func TestAdd(t \*testing.T) {
-got := add(10, 20)
-want := 30
+func TestAdd(t *testing.T) {
+	got := add(10, 20)
+	want := 30
 
-    if got != want {
-    	t.Errorf("add(10, 20) = %d; want %d", got, want)
-    }
-
+	if got != want {
+		t.Errorf("add(10, 20) = %d; want %d", got, want)
+	}
 }
+```
 
-একই directory-তে দুটি file রাখবে। তারপর চালাবে:
+Run the test:
+
+```bash
 go test
+```
 
-ফলাফল ঠিক থাকলে test pass করবে। Function ছোট ও নির্দিষ্ট দায়িত্বের হলে bug কোথায় হয়েছে তা শনাক্ত করা সহজ হয়। 5. Separation of Concerns — আলাদা কাজ আলাদা function-এ রাখা
-একটি booking system-এ বিভিন্ন কাজের জন্য আলাদা function থাকতে পারে।
-Create Booking
-মূল booking operation
+If the actual result matches the expected result, the test passes.
 
-validateBooking()
-Input validation
+**Benefits:**
 
-calculatePrice()
-Price calculation
+- Helps identify bugs.
+- Verifies expected behavior.
+- Makes refactoring safer.
+- Improves code reliability.
 
-saveBooking()
-Database operation
+## 5. Separation of Concerns
 
-processPayment()
-Payment processing
+**Separation of concerns** means dividing a program into functions with clear and distinct responsibilities.
 
-প্রতিটি function-এর আলাদা দায়িত্ব থাকলে code maintain ও test করা সহজ হয়। তবে বাস্তবে payment processing এবং database transaction-এর মতো কাজের জন্য অতিরিক্ত security ও consistency ব্যবস্থা দরকার। 6. Functions-এর প্রধান সুবিধা
-সুবিধা কেন দরকার
-Reusability একই logic বারবার ব্যবহার করা
-Maintainability পরিবর্তন সহজ করা
-Readability code বোঝা সহজ করা
-Testability আলাদাভাবে test করা
-Modularity বড় problem-কে ছোট অংশে ভাগ করা
-Debugging সমস্যার উৎস শনাক্ত করা
-Abstraction ভেতরের implementation না জেনেও function ব্যবহার করা
-Practice task
-একটি Go program লেখো যেখানে তিনটি function থাকবে:
+For example, a booking system may contain the following functions:
 
-1. calculateTotal(price, quantity int) int
-2. isEligible(age int) bool
-3. printWelcome(name string)
-   তারপর main() থেকে প্রতিটি function call করবে।
-   Senior Developer tip: Function তৈরি করার সময় নিজেকে প্রশ্ন করবে—এই function-এর একটি পরিষ্কার দায়িত্ব আছে কি? সাধারণত ছোট, নির্দিষ্ট দায়িত্বের function পড়তে, test করতে এবং পরিবর্তন করতে সহজ হয়। তবে অকারণে অতিরিক্ত ছোট function তৈরি করাও প্রয়োজন নেই।
+| Function            | Responsibility                            |
+| ------------------- | ----------------------------------------- |
+| `validateBooking()` | Validates booking input                   |
+| `calculatePrice()`  | Calculates the booking price              |
+| `saveBooking()`     | Saves booking information to the database |
+| `processPayment()`  | Coordinates payment processing            |
+
+Each function focuses on a particular responsibility, making the system easier to maintain and test.
+
+In production systems, database transactions, payment verification, error handling, and security must also be designed carefully.
+
+## 6. Main Benefits of Functions
+
+| Benefit         | Explanation                                                           |
+| --------------- | --------------------------------------------------------------------- |
+| Reusability     | Reuse the same logic multiple times                                   |
+| Maintainability | Make code easier to modify                                            |
+| Readability     | Make code easier to understand                                        |
+| Testability     | Test logic independently                                              |
+| Modularity      | Divide large problems into smaller parts                              |
+| Debugging       | Identify the source of problems more easily                           |
+| Abstraction     | Use functionality without needing to know every implementation detail |
+
+## 7. Practice Task
+
+Write a Go program containing the following three functions:
+
+1. `calculateTotal(price, quantity int) int` — returns the total price.
+2. `isEligible(age int) bool` — returns whether the given age is at least 18.
+3. `printWelcome(name string)` — prints a welcome message.
+
+Call all three functions from `main()`.
+
+### Expected Concepts
+
+- Function declaration
+- Parameters and arguments
+- Return values
+- Boolean values
+- Function calls
+- Code reusability
+
+## Senior Developer Tip
+
+Before creating a function, ask yourself:
+
+**"Does this function have one clear responsibility?"**
+
+Functions with clear responsibilities are generally easier to read, test, debug, and maintain. However, avoid creating unnecessary functions that make simple logic harder to follow.
+
+---
+
+**Next Topic:** Function Parameters, Return Values, Multiple Return Values, and Error Handling in Go.
