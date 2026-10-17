@@ -1,4 +1,4 @@
-# [Golang] 014 — What Is Scope?
+# [Golang] 06 — What Is Scope?
 
 ## 1. What Is Scope?
 
